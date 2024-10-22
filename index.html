@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Essensempfehlungssystem</title>
+		<style>
+			/* Grundlegendes Styling */
+			body {
+				font-family: Arial, sans-serif;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				background-color: #b9d3bd;
+			}
+			/* Khung chứa tiêu đề "Essensempfehlung" */
+			#introBox {
+				width: 80%;
+				padding: 20px;
+				margin: 20px;
+				text-align: center;
+				font-size: 24px;
+				font-weight: bold;
+				color: #ffffff;
+				background-color: #2d6a2d; /* Dunkelgrün */
+				border: 4px solid #338a33; /* Rahmen với màu xanh đậm hơn */
+				border-radius: 15px; /* Bo tròn góc của khung */
+			}
+			h2 {
+				color: #2d6a2d;
+			}
+
+			#filters {
+				margin: 20px;
+			}
+
+			label {
+				margin-right: 15px;
+			}
+
+			#pieChartContainer {
+				width: 28%;
+				margin: 20px auto;
+				position: relative;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			#tagCheckboxes {
+				display: none; /* Standardmäßig ausgeblendet */
+				margin-left: 20px;
+				text-align: left;
+			}
+
+			#tagCheckboxes label {
+				display: block;
+				margin: 5px 0;
+				color: #120a0a;
+				font-weight: bold;
+			}
+
+			#resetButton {
+				display: none; /* Standardmäßig ausgeblendet */
+				margin-top: 10px;
+				padding: 10px 20px;
+				background-color: #136015;
+				color: white;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+
+			#resetButton:hover {
+				background-color: #060606;
+			}
+
+			#recipesTable {
+				width: 80%;
+				margin: 20px;
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+
+			th,
+			td {
+				padding: 10px;
+				text-align: left;
+				border-bottom: 1px solid #ddd;
+				cursor: pointer;
+			}
+
+			th:hover,
+			td:hover {
+				background-color: #f1f1f1;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="introBox">Essensempfehlungssystem</div>
+		<!-- Filter für Ernährungsbedürfnisse -->
+		<div id="filters">
+			<h2>Ernährungsfilter</h2>
+			<label><input type="checkbox" id="vegan" name="vegan" /> Vegan</label>
+			<label><input type="checkbox" id="halal" name="halal" /> Halal</label>
+			<label
+				><input type="checkbox" id="fructosefrei" name="fructosefrei" />
+				Fruktosefrei</label
+			>
+		</div>
+
+		<!-- Tortendiagramm Kategorieauswahl -->
+		<div id="pieChartContainer">
+			<canvas id="pieChart1"></canvas>
+			<canvas id="pieChart2" style="display: none; opacity: 0"></canvas>
+			<!-- Initially hidden and transparent -->
+		</div>
+
+		<!-- Button zum Zurücksetzen der Auswahl -->
+		<button id="resetButton" style="display: none" onclick="resetSelection()">
+			Kategorie zurücksetzen
+		</button>
+
+		<!-- Chart.js Bibliothek -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script>
+			let categoryChart, subCategoryChart;
+
+			// Funktion, um das Tortendiagramm zu erstellen
+			function createPieChart1(data, labels, onClick) {
+				const ctx = document.getElementById("pieChart1").getContext("2d");
+				return new Chart(ctx, {
+					type: "pie",
+					data: {
+						datasets: [
+							{
+								data: data,
+								backgroundColor: ["#FFF5E4", "#6A9C89", "#CD5C08"], // Farben für die Kategorien
+							},
+						],
+						labels: labels,
+					},
+					options: {
+						responsive: true,
+						onClick: onClick,
+					},
+				});
+			}
+
+			function createPieChart2(data, labels, onClick) {
+				const ctx = document.getElementById("pieChart2").getContext("2d");
+				return new Chart(ctx, {
+					type: "pie",
+					data: {
+						datasets: [
+							{
+								data: data,
+								backgroundColor: ["#FFD700", "#FF6347", "#4682B4", "#32CD32"], // Farben für die Unterkategorien
+							},
+						],
+						labels: labels,
+					},
+					options: {
+						responsive: true,
+						onClick: onClick,
+					},
+				});
+			}
+
+			// Initiales Tortendiagramm für die Kategorieauswahl
+			function initializeChart() {
+				categoryChart = createPieChart1(
+					[1, 1, 1], // Daten für das Tortendiagramm
+					["Frühstück", "Mittagessen", "Abendessen"], // Labels für die Kategorien
+					function (event, elements) {
+						if (elements.length > 0) {
+							const clickedIndex = elements[0].index;
+							const category = categoryChart.data.labels[clickedIndex];
+
+							// Zeigt nur die ausgewählte Kategorie im Diagramm
+							categoryChart.data.datasets[0].data = [1];
+							categoryChart.data.labels = [category];
+							categoryChart.update();
+
+							// Zeigt den zweiten Tortendiagramm an
+							showSubCategoryChart();
+						}
+					}
+				);
+			}
+
+			// Funktion, um das zweite Tortendiagramm anzuzeigen
+			function showSubCategoryChart() {
+				// Erstelle das zweite Tortendiagramm (nur wenn es noch nicht existiert)
+				if (!subCategoryChart) {
+					subCategoryChart = createPieChart2(
+						[10, 20, 10, 40], // Daten für das zweite Tortendiagramm
+						["Süß", "Sauer", "Heiß", "Kalt"], // Labels für die Unterkategorien
+						function (event, elements) {
+							if (elements.length > 0) {
+								const clickedIndex = elements[0].index;
+								const subCategory = subCategoryChart.data.labels[clickedIndex];
+								alert(
+									`Kategorie: ${categoryChart.data.labels[0]}, Unterkategorie: ${subCategory}`
+								);
+
+								// Hier könnte eine Funktion aufgerufen werden, um Rezepte basierend auf den Kategorien zu filtern
+							}
+						}
+					);
+				}
+
+				// Fadet den zweiten Tortendiagramm ein
+				const pieChart2 = document.getElementById("pieChart2");
+				pieChart2.style.display = "block";
+				fadeIn(pieChart2, 0.02);
+			}
+
+			// Funktion zum Einfaden
+			function fadeIn(element, speed) {
+				let opacity = 0;
+				const interval = setInterval(function () {
+					if (opacity >= 1) {
+						clearInterval(interval);
+					} else {
+						opacity += speed;
+						element.style.opacity = opacity;
+					}
+				}, 50);
+			}
+
+			// Funktion, um die Auswahl zurückzusetzen
+			function resetSelection() {
+				// Setzt das erste Tortendiagramm auf den Ursprungszustand zurück
+				categoryChart.data.datasets[0].data = [1, 1, 1];
+				categoryChart.data.labels = ["Frühstück", "Mittagessen", "Abendessen"];
+				categoryChart.update();
+
+				// Setzt das zweite Tortendiagramm zurück und blendet es aus
+				if (subCategoryChart) {
+					document.getElementById("pieChart2").style.display = "none";
+					document.getElementById("pieChart2").style.opacity = 0;
+					subCategoryChart.destroy();
+					subCategoryChart = null;
+				}
+
+				// Versteckt den Reset-Button
+				document.getElementById("resetButton").style.display = "none";
+			}
+
+			// Initialisiere das Diagramm beim Laden der Seite
+			window.onload = initializeChart;
+		</script>
+
+		<!-- Rezeptvorschläge Tabelle -->
+		<div id="recipesTable">
+			<h2>Rezeptempfehlungen</h2>
+			<table id="recipeTable">
+				<thead>
+					<tr>
+						<th onclick="sortTable(0)">Name</th>
+						<th onclick="sortTable(1)">Kategorie</th>
+						<th onclick="sortTable(2)">Tags</th>
+					</tr>
+				</thead>
+				<tbody>
+					<!-- Beispielrezepte -->
+					<tr>
+						<td>Pancakes</td>
+						<td>Frühstück</td>
+						<td>Süß, Schnell</td>
+					</tr>
+					<tr>
+						<td>Caesar Salat</td>
+						<td>Mittagessen</td>
+						<td>Gesund, Herzhaft</td>
+					</tr>
+					<tr>
+						<td>Avocado Toast</td>
+						<td>Frühstück</td>
+						<td>Gesund, Herzhaft, Schnell</td>
+					</tr>
+					<tr>
+						<td>Spaghetti Carbonara</td>
+						<td>Mittagessen</td>
+						<td>Herzhaft, Schnell</td>
+					</tr>
+					<tr>
+						<td>Schokoladenmousse</td>
+						<td>Abendessen</td>
+						<td>Süß, Schnell</td>
+					</tr>
+					<tr>
+						<td>Quinoa Bowl</td>
+						<td>Mittagessen</td>
+						<td>Gesund, Vegan</td>
+					</tr>
+					<tr>
+						<td>Tomaten-Basilikum-Salat</td>
+						<td>Abendessen</td>
+						<td>Gesund, Schnell</td>
+					</tr>
+					<tr>
+						<td>French Toast</td>
+						<td>Frühstück</td>
+						<td>Süß, Schnell</td>
+					</tr>
+					<tr>
+						<td>Chicken Curry</td>
+						<td>Abendessen</td>
+						<td>Herzhaft, Halal</td>
+					</tr>
+					<tr>
+						<td>Obstsalat</td>
+						<td>Frühstück</td>
+						<td>Gesund, Süß</td>
+					</tr>
+					<tr>
+						<td>Steak mit Gemüse</td>
+						<td>Abendessen</td>
+						<td>Herzhaft, Gesund</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</body>
+</html>
