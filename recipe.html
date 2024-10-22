@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Rezept App</title>
+	</head>
+	<body>
+		<h1>Rezepte</h1>
+		<ul id="rezeptListe"></ul>
+
+		<div id="rezeptDetails" style="display: none">
+			<h2 id="rezeptName"></h2>
+			<p><strong>Zutaten:</strong> <span id="zutaten"></span></p>
+			<p>
+				<strong>Zubereitungszeit:</strong> <span id="zubereitungszeit"></span>
+			</p>
+			<p>
+				<strong>Schwierigkeitsgrad:</strong>
+				<span id="schwierigkeitsgrad"></span>
+			</p>
+			<p><strong>Portionsgröße:</strong> <span id="portionsgroesse"></span></p>
+		</div>
+
+		<script>
+			async function fetchRecipes() {
+				try {
+					const response = await fetch("data/recipes.json"); // Lade die JSON-Datei
+					if (!response.ok) {
+						throw new Error("Fehler beim Laden der Rezepte");
+					}
+					const recipes = await response.json();
+					displayRecipes(recipes);
+				} catch (error) {
+					console.error("Fehler:", error);
+				}
+			}
+
+			function displayRecipes(recipes) {
+				const rezeptListe = document.getElementById("rezeptListe");
+				rezeptListe.innerHTML = "";
+
+				recipes.forEach((recipe, index) => {
+					const listItem = document.createElement("li");
+					listItem.textContent = recipe.Rezeptname;
+					listItem.style.cursor = "pointer";
+					listItem.addEventListener("click", () =>
+						showRecipeDetails(index, recipes)
+					);
+					rezeptListe.appendChild(listItem);
+				});
+			}
+
+			function showRecipeDetails(index, recipes) {
+				const recipe = recipes[index];
+				document.getElementById("rezeptName").textContent = recipe.Rezeptname;
+				document.getElementById("zutaten").textContent = recipe.Zutaten;
+				document.getElementById("zubereitungszeit").textContent =
+					recipe.Zubereitungszeit;
+				document.getElementById("schwierigkeitsgrad").textContent =
+					recipe.Schwierigkeitsgrad;
+				document.getElementById("portionsgroesse").textContent =
+					recipe.Portionsgröße;
+
+				document.getElementById("rezeptDetails").style.display = "block";
+			}
+
+			// Rezepte beim Laden der Seite abrufen
+			fetchRecipes();
+		</script>
+	</body>
+</html>
