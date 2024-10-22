@@ -1,0 +1,37 @@
+[
+    {
+        "Rezeptname": "Spaghetti Bolognese",
+        "Zutaten": "Spaghetti, Rinderhackfleisch, Tomaten, Zwiebeln, Knoblauch, Olivenöl, Salz, Pfeffer",
+        "Zubereitungszeit": "45 Minuten",
+        "Schwierigkeitsgrad": "Mittel",
+        "Portionsgröße": "4 Personen"
+    },
+    {
+        "Rezeptname": "Caesar Salat",
+        "Zutaten": "Römersalat, Hühnerbrust, Croutons, Parmesan, Caesar-Dressing",
+        "Zubereitungszeit": "25 Minuten",
+        "Schwierigkeitsgrad": "Leicht",
+        "Portionsgröße": "2 Personen"
+    },
+    {
+        "Rezeptname": "Linsensuppe",
+        "Zutaten": "Linsen, Karotten, Zwiebeln, Knoblauch, Sellerie, Brühe, Lorbeerblatt, Pfeffer, Salz",
+        "Zubereitungszeit": "1 Stunde",
+        "Schwierigkeitsgrad": "Mittel",
+        "Portionsgröße": "6 Personen"
+    },
+    {
+        "Rezeptname": "Schoko-Brownies",
+        "Zutaten": "Schokolade, Butter, Mehl, Zucker, Eier, Backpulver, Kakaopulver",
+        "Zubereitungszeit": "35 Minuten",
+        "Schwierigkeitsgrad": "Leicht",
+        "Portionsgröße": "12 Stück"
+    },
+    {
+        "Rezeptname": "Gemüse-Curry",
+        "Zutaten": "Kokosmilch, Currypaste, Süßkartoffeln, Karotten, Erbsen, Paprika, Reis",
+        "Zubereitungszeit": "40 Minuten",
+        "Schwierigkeitsgrad": "Mittel",
+        "Portionsgröße": "4 Personen"
+    }
+]
